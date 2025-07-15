@@ -51,12 +51,12 @@ else:
         if credits <= 0:
             print('You have no credits left to play')
             print('You played ' + str(number_of_plays) + ' times')
-            break
+            quit()
         else:
             again = input('Do you want to play again? (yes/y/no/n): ')
             if again != 'yes' :
                 print('Thanks for playing!')
-                break
+                quit()
        
     
 
