@@ -18,7 +18,7 @@ else:
     creditswon = 0
     print('This is a gambling game you have ' + str(credits) + ' credits to use on a bad slot machine')
     bet = input('how much do you wnat to bet 5 or 20 or 10 credits? ')
-    #Function to use slot machine It cheaks if the user has enough credits to play 
+    #Function to use slot machine It cheaks if the user has enough credits to play. it also spins the slot amchine 
     def play(): 
         global credits, number_of_plays, bet , creditswon
 
