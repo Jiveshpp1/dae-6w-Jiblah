@@ -4,11 +4,11 @@ if int(agever) < 17:
     print('You are too young to play this game')
     quit()
 elif int(agever) > 121:
-    print('You are faking your age to play this game')
+    print('You are faking your age to play this game') 
     quit()
 elif int(agever) == 17:
     print('no')
-    print('Your ID still screams “nice try".')
+    print('Stupid.')
     quit()
 else:        
     print('Welcome to the game')
@@ -18,7 +18,7 @@ else:
     creditswon = 0
     print('This is a gambling game you have ' + str(credits) + ' credits to use on a bad slot machine')
     bet = input('how much do you wnat to bet 5 or 20 or 10 credits? ')
-    #Function to use slot machine It cheaks if the user has enough credits to play. it also spins the slot amchine 
+    #Function to use slot machine It checks if the user has enough credits to play. it also spins the slot amchine 
     def play(): 
         global credits, number_of_plays, bet , creditswon
 
@@ -70,6 +70,7 @@ else:
             credits -= int(bet)
             number_of_plays += 1 
             print('You now have ' + str(credits) + ' credits')
+            print('__________________')
     play()
     
     while True:
@@ -80,7 +81,7 @@ else:
             play()
         elif again == "no" or again == "n":
             print("Thanks for playing!")
-            break
+            quit()
         else:
             print("Please enter yes or no.")
     
