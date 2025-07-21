@@ -18,10 +18,10 @@ else:
     creditswon = 0
     print('This is a gambling game you have ' + str(credits) + ' credits to use on a bad slot machine')
     bet = input('how much do you wnat to bet 5 or 20 or 10 credits? ')
-    #Function to use slot machine It checks if the user has enough credits to play. it also spins the slot amchine 
+    # The play() function simulates spinning a slot machine, checks win conditions, updates credits and play count, and prints the result.
     def play(): 
         global credits, number_of_plays, bet , creditswon
-
+        # Check if the bet is valid and within the available credits
         if bet not in ['1','5', '10','20']:
             print('You can only bet 1 or 10 or 20 credits')
             quit()
@@ -29,13 +29,15 @@ else:
             print('You have no credits left to play')
             print('You played ' + str(number_of_plays) + ' times')
             print('You won ' + str(creditswon) + ' credits')
-            quit()      
+            quit()   
+            # The slot machine generates three random symbols for each row.   
         oof =[random.choice(symbles),random.choice(symbles),random.choice(symbles)]
         oofu = [random.choice(symbles),random.choice(symbles),random.choice(symbles)]
         oofd = [random.choice(symbles),random.choice(symbles),random.choice(symbles)]
         print('|'.join(oofu))
         print('|'.join(oof))
         print('|'.join(oofd))
+        # Check for winning conditions based on the generated symbols.
         if oof[0] == oof[1] == oof[2] == oofu[0] == oofu[1] == oofu[2] == oofd[0] == oofd[1] == oofd[2]== '💎':
             print('You won le thgy!')
             credits += 100000*int(bet)
