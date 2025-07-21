@@ -1,5 +1,6 @@
 import random
 agever = input('Enter your age: ')
+# The part is thew age verifacation part of the code, it checks if the user is old enough to play the game.
 if int(agever) < 17:
     print('You are too young to play this game')
     quit()
@@ -10,7 +11,8 @@ elif int(agever) == 17:
     print('no')
     print('Stupid.')
     quit()
-else:        
+else: 
+    #This welcomes the player and intailized the game variables.       
     print('Welcome to the game')
     credits = 100
     number_of_plays = 0
@@ -74,7 +76,7 @@ else:
             print('You now have ' + str(credits) + ' credits')
             print('__________________')
     play()
-    
+    # This is the loop alowing the player to play the game multiple times or exit.
     while True:
 
         again = input("Do you want to play? (yes/y/no/n): ").lower()
