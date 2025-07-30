@@ -1,0 +1,52 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Calender</title>
+</head>
+<body>
+    <header class="main-header"> 
+        <h1>Calendar Page</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html" cl>Login</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+
+    </header>
+    <hr>
+    <main>
+        <div class="calendar-section">
+            <div class='cal-head'>
+                <button type="button" id="next-btn">Prev</button>
+                <h2 id="dateth"></h2>
+                <button type="button" id="nest-btn">Next</button>
+            </div>
+            <div id='m-cal'>
+                <div class='cal-day'>Sun</div>
+                <div class='cal-day'>Mon</div>
+                <div class='cal-day'>Tue</div>
+                <div class='cal-day'>Wed</div>
+                <div class='cal-day'>Thu</div>
+                <div class='cal-day'>Fri</div>
+                <div class='cal-day'>Sat</div>
+                <!-- Let JS Cook -->
+            </div>  
+        </div>
+        
+        <div class="events-section">
+            <h2>Upcoming Events</h2>
+            <p>List of upcoming events will be displayed here.</p>
+            <!-- Events content goes here -->
+        </div>
+        <div id="sa"></div>
+    </main>
+    <footer>
+        <p>Footer content goes here</p>
+    </footer>
+    <script src="main.js"></script>
+</body>
+</html>
