@@ -20,17 +20,22 @@ function renderCalendar(){
     document.getElementById('dateth').innerText = `${mName[month]} ${year}`;
     calendarGrid.querySelectorAll('.cal-date, .other-month, .today').forEach(el => el.remove());
     
+    for (let i = 0; i < firstDayIndex; i++) {
+        const blank = document.createElement('div');
+        blank.classList.add('other-month'); // use gray or blank style
+        calendarGrid.appendChild(blank);
+    }
     for (let i = 1; i <= lastDay; i++){
         const dayElement = document.createElement('div');
         dayElement.classList.add('cal-date')
         dayElement.textContent = i;
         calendarGrid.appendChild(dayElement);
+        const today = new Date();
+        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            dayElement.classList.add('today');
+        }
     }
-    for (let i = 0; i < firstDayIndex; i++) {
-    const blank = document.createElement('div');
-    blank.classList.add('other-month'); // use gray or blank style
-    calendarGrid.appendChild(blank);
-}
+    
 }
 prevBtn.addEventListener('click',() => {
     currentDate.setMonth(currentDate.getMonth() - 1);

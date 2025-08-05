@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="main.css">
     <title>Calender</title>
+    <script src="main.js"></script>                                         
 </head>
 <body>
     <header class="main-header"> 
@@ -21,9 +22,9 @@
     <main>
         <div class="calendar-section">
             <div class='cal-head'>
-                <button type="button" id="next-btn">Prev</button>
+                <button type="button" id="prev-btn">Prev</button>
                 <h2 id="dateth"></h2>
-                <button type="button" id="nest-btn">Next</button>
+                <button type="button" id="next-btn">Next</button>
             </div>
             <div id='m-cal'>
                 <div class='cal-day'>Sun</div>
@@ -36,9 +37,15 @@
                 <!-- Let JS Cook -->
             </div>  
         </div>
-        
-        <div class="events-section">
-            <h2>Upcoming Events</h2>
+
+        <div class="reminder-section">
+            <h2>Reminders</h2>
+            <p>Set your reminders here.</p>
+            <!-- Reminder content goes here -->
+        </div>
+
+        <div class="events-section" id="events">
+            <h2>Events this month</h2>
             <p>List of upcoming events will be displayed here.</p>
             <!-- Events content goes here -->
         </div>
@@ -46,7 +53,8 @@
     </main>
     <footer>
         <p>Footer content goes here</p>
+        <a href="https://www.youtube.com/watch?v=z3bYC3Jm33Q"><img src="LUIS GAMER.jpeg" alt="Luis Gamer" style="width: 5px; height: 5px;"></a>
     </footer>
-    <script src="main.js"></script>
+    
 </body>
 </html>
