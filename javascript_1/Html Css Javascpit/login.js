@@ -1,23 +1,18 @@
 console.log('initial js load');
 
 // Import the functions you need
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged} 
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 console.log('import');
+import {firebaseConfig} from './config.js';
+initializeApp(firebaseConfig);
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAQTllvhfaCWrEPxgZsMV7yy6t1jhOTQQQ",
-  authDomain: "calendarpreject-thingy.firebaseapp.com",
-  projectId: "calendarpreject-thingy",
-  storageBucket: "calendarpreject-thingy.firebasestorage.app",
-  messagingSenderId: "885696417935",
-  appId: "1:885696417935:web:463af5e32b67a55554a0fa",
-  measurementId: "G-XK7FLC21XW"
-};
+
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -25,6 +20,16 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 console.log("Firebase initialized");
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadUserEvents(user.uid);  // Directly use user.uid
+  } else {
+    console.warn('No user logged in');
+    window.location.replace('login.html'); // Optional: redirect to login if not signed in
+  }
+});
+
+
 
 // Signup function
 function registerUser(email, password){
@@ -52,11 +57,11 @@ function signInUser(email, password) {
         })
         .catch((error) => {
             console.error('Sign-in error:', error.code, error.message);
-            alert(error.message);
+            alert('Wrong user of password or your acount doesnt exsit' ,error.message);
         });
 }
 
-// Attach event listeners after DOM is ready
+
 document.addEventListener('DOMContentLoaded', () => {
   
   const signupForm = document.getElementById('s_form');

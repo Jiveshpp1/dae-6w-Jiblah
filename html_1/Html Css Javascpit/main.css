@@ -222,3 +222,19 @@ button:active{
   font-weight: bolder;
   font-size: 20px;
 }
+.delete-btn::before{
+    content: "\00D7";
+}
+.delete-btn {
+    margin-left: 10px;
+}
+
+/* A simple hover effect to show the button is interactive */
+.delete-btn:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
+
+/* Adds a bit of space below each list item for better readability */
+li {
+    margin-bottom: 5px;}

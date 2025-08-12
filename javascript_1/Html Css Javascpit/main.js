@@ -1,25 +1,22 @@
 console.log('initial js load');
 
-// Import the functions you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"; // fixed
-console.log('import');
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAQTllvhfaCWrEPxgZsMV7yy6t1jhOTQQQ",
-  authDomain: "calendarpreject-thingy.firebaseapp.com",
-  projectId: "calendarpreject-thingy",
-  storageBucket: "calendarpreject-thingy.firebasestorage.app",
-  messagingSenderId: "885696417935",
-  appId: "1:885696417935:web:463af5e32b67a55554a0fa",
-  measurementId: "G-XK7FLC21XW"
-};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+console.log('import');
+import {firebaseConfig} from './config.js';
+initializeApp(firebaseConfig);
+
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
+const auth = getAuth(app);
+const db = getFirestore(app);
 console.log("Firebase initialized");
 
 document.addEventListener('DOMContentLoaded', () => { 
@@ -47,9 +44,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date();
     let selectedDate = null;
     let events = {}; 
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("User is signed in:", user.email);
+          loadUserEvents(user.uid);
+        } else {
+          console.log("No user signed in, redirecting to login...");
+          window.location.replace("index.html");
+        }
+      });
 
+    async function loadUserEvents(uid) {
+        try {
+          const docRef = doc(db, "users", uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            events = docSnap.data().events || {};
+            renderCalendar();
+            renderEvents();
+            renderReminders();
+            console.log("Events loaded for user");
+          } else {
+            console.log("No events found for this user yet.");
+            events = {};
+            renderCalendar();
+            renderEvents();
+            renderReminders();
+          }
+        } catch (error) {
+          console.error("Error loading events:", error);
+        }
+      }
+    async function saveUserEvents(uid, events) {
+        try {
+          await setDoc(doc(db, "users", uid), { events });
+          console.log("Events saved to Firestore!");
+        } catch (error) {
+          console.error("Error saving events:", error);
+        }
+      }
     function getToday() {
-      const t = new Date();
+      const t = new Date();``
       return `${t.getFullYear()}-${t.getMonth()}-${t.getDate()}`;
     }
 
@@ -82,6 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
         monthDisplay.innerText = `${mName[month]} ${year}`;
 
         calendarGrid.querySelectorAll('.cal-date, .other-month, .today').forEach(el => el.remove());
+        calendarGrid.innerHTML = `
+        <div class='cal-day'>Sun</div>
+        <div class='cal-day'>Mon</div>
+        <div class='cal-day'>Tue</div>
+        <div class='cal-day'>Wed</div>
+        <div class='cal-day'>Thu</div>
+        <div class='cal-day'>Fri</div>
+        <div class='cal-day'>Sat</div>
+        `;
 
         for (let i = 0; i < firstDayIndex; i++) {
             const blank = document.createElement('div');
@@ -138,16 +182,41 @@ document.addEventListener('DOMContentLoaded', () => {
         eventTitleInput.value = '';
     }
 
-    function saveEvent(){
-        const eTitle = eventTitleInput.value;
-        if (eTitle && selectedDate){
-            const dateStr = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
-            if (!events[dateStr]){
-                events[dateStr] = [];
-            }
-            events[dateStr].push(eTitle);
-            closeModal();
-            renderCalendar();
+    async function saveEvent() {
+      const eTitle = eventTitleInput.value;
+      if (eTitle && selectedDate) {
+        const dateStr = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
+        if (!events[dateStr]) {
+          events[dateStr] = [];
+        }
+        events[dateStr].push(eTitle);
+        closeModal();
+        renderCalendar();
+
+        const user = auth.currentUser;
+        if (user) {
+          await saveUserEvents(user.uid, events);
+          renderEvents();
+          renderReminders();
+        } else {
+          console.error("No user logged in — can't save events");
+        }
+      }
+    }
+    async function deleteEvent(dateKey, eventIndex){
+      if(events[dateKey] && events[dateKey][eventIndex]){
+        events[dateKey].splice(eventIndex, 1);
+      }
+       if (events[dateKey].length === 0) {
+            delete events[dateKey];
+        }
+        if (currentUser){
+          await saveUserEvents(currentUser.uid, events);
+          renderCalendar();
+          renderEvents();
+          renderReminders();
+        }else{
+          console.error("No user logged in - can't delete event");
         }
     }
 
@@ -161,7 +230,15 @@ document.addEventListener('DOMContentLoaded', () => {
             events[dateKey].forEach(title => {
               const li = document.createElement('li');
               li.textContent = `${d} ${mName[m]}: ${title}`;
+              const deleteBtn = document.createElement('button');
+              deleteBtn.textContent = ' ';
+              deleteBtn.classList.add('delete-btn'); 
+              deleteBtn.addEventListener('click', () => deleteEvent(dateKey, index));
+
+              
+              li.appendChild(deleteBtn);
               eventList.appendChild(li);
+              
             });
           }
         }
