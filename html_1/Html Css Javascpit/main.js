@@ -1,14 +1,15 @@
 console.log('initial js load');
 
-
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-console.log('import');
-import {firebaseConfig} from './config.js';
-initializeApp(firebaseConfig);
+// Firebase config
+import { firebaseConfig } from './config.js';
 
 
 
@@ -18,6 +19,45 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
 console.log("Firebase initialized");
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadUserEvents(user.uid);  // Directly use user.uid
+    console.log('Userlogeed in', user.email);
+  } else {
+    console.warn('No user logged in');
+    if(window.location.pathname.includes('main.html')){
+      window.location.replace('login.html');}
+  }
+});
+function registerUser(email, password){
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredetail) => {
+            const user = userCredetail.user;
+            console.log('User Created: ', user.email);
+            alert('You have created your account :)');
+            console.log("Redirecting to main.html...");
+            window.location.replace("main.html");  // redirect after signup
+        })
+        .catch((error) => {
+            console.error('Error:', error.code, error.message);
+            alert(error.message);
+        });
+}
+
+// Login function
+function signInUser(email, password) {
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredetail) => {
+            console.log('Signed in:', userCredetail.user.email);
+            alert('Welcome back!');
+            window.location.replace("main.html");  // redirect after login
+        })
+        .catch((error) => {
+            console.error('Sign-in error:', error.code, error.message);
+            alert('Wrong user of password or your acount doesnt exsit' ,error.message);
+        });
+}
+
 
 document.addEventListener('DOMContentLoaded', () => { 
     const monthDisplay = document.getElementById('dateth');
@@ -31,6 +71,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('close');
     const eventList = document.getElementById('event-list');
     const reminderList = document.getElementById('reminder-list');
+
+     
+    const signupForm = document.getElementById('s_form');
+    if (signupForm) {
+      signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email_s').value;
+        const password = document.getElementById('pass_s').value;
+        registerUser(email, password);
+      });
+    }
+
+    const loginForm = document.getElementById('login_form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('user_name').value;
+        const password = document.getElementById('pass').value;
+        signInUser(email, password);
+      });
+    }
+
 
     saveEventBtn.addEventListener('click', () => {
       saveEvent();
@@ -203,46 +265,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-    async function deleteEvent(dateKey, eventIndex){
-      if(events[dateKey] && events[dateKey][eventIndex]){
-        events[dateKey].splice(eventIndex, 1);
+    async function deleteEvent(dateKey, eventIndex) {
+      if (!events[dateKey] || events[dateKey][eventIndex] === undefined) return;
+
+      
+      events[dateKey].splice(eventIndex, 1);
+
+      
+      if (events[dateKey].length === 0) {
+        delete events[dateKey];
       }
-       if (events[dateKey].length === 0) {
-            delete events[dateKey];
-        }
-        if (currentUser){
-          await saveUserEvents(currentUser.uid, events);
-          renderCalendar();
-          renderEvents();
-          renderReminders();
-        }else{
-          console.error("No user logged in - can't delete event");
-        }
+
+      const user = auth.currentUser; 
+      if (user) {
+        await saveUserEvents(user.uid, events);
+        renderCalendar();
+        renderEvents();
+        renderReminders();
+      } else {
+        console.error("No user logged in - can't delete event");
+      }
     }
+
 
     function renderEvents() {
-        eventList.innerHTML = '';
-        const year  = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        for (const dateKey in events) {
-          const [y, m, d] = dateKey.split('-').map(Number);
-          if (y === year && m === month) {
-            events[dateKey].forEach(title => {
-              const li = document.createElement('li');
-              li.textContent = `${d} ${mName[m]}: ${title}`;
-              const deleteBtn = document.createElement('button');
-              deleteBtn.textContent = ' ';
-              deleteBtn.classList.add('delete-btn'); 
-              deleteBtn.addEventListener('click', () => deleteEvent(dateKey, index));
+      eventList.innerHTML = '';
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
 
-              
-              li.appendChild(deleteBtn);
-              eventList.appendChild(li);
-              
-            });
-          }
-        }
+      for (const dateKey in events) {
+        const [y, m, d] = dateKey.split('-').map(Number);
+        if (y === year && m === month) {
+          events[dateKey].forEach((title, index) => { 
+            const li = document.createElement('li');
+            li.textContent = `${d} ${mName[m]}: ${title}`;
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = ' '; 
+            deleteBtn.classList.add('delete-btn');
+            deleteBtn.addEventListener('click', () => deleteEvent(dateKey, index)); // FIX: pass index
+
+            li.appendChild(deleteBtn);
+            eventList.appendChild(li);
+      });
     }
+  }
+}
+
 
     renderCalendar();
     renderEvents();
